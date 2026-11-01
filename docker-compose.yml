@@ -1,0 +1,28 @@
+services:
+  jenkins:
+    build: ./jenkins
+    container_name: jenkins
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    environment:
+      DOCKER_HOST: tcp://docker:2375
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    depends_on:
+      - docker
+
+  docker:
+    image: docker:27-dind
+    container_name: jenkins-docker
+    privileged: true
+    environment:
+      DOCKER_TLS_CERTDIR: ""
+    command:
+      - --host=tcp://0.0.0.0:2375
+      - --host=unix:///var/run/docker.sock
+    ports:
+      - "8081:8081"
+
+volumes:
+  jenkins_home:
